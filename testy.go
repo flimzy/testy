@@ -2,6 +2,7 @@ package testy
 
 import (
 	"net/http"
+	"regexp"
 	"testing"
 )
 
@@ -51,6 +52,22 @@ func StatusError(t *testing.T, expected string, status int, actual error) {
 	}
 	if status != actualStatus {
 		t.Errorf("Unexpected status code: %d", actualStatus)
+	}
+	if actual != nil {
+		t.SkipNow()
+	}
+}
+
+// ErrorRE compares actual.Error() against expected, which is treated as a
+// regular expression, and triggers an error if they do not match. If actual is
+// non-nil, t.SkipNow() is called as well.
+func ErrorRE(t *testing.T, expected string, actual error) {
+	var err string
+	if actual != nil {
+		err = actual.Error()
+	}
+	if !regexp.MustCompile(expected).MatchString(err) {
+		t.Errorf("Unexpected error: %s", err)
 	}
 	if actual != nil {
 		t.SkipNow()
