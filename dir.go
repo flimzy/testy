@@ -3,6 +3,7 @@ package testy
 import (
 	"io/ioutil"
 	"os"
+	"strings"
 	"testing"
 )
 
@@ -36,7 +37,7 @@ func TempDir(t *testing.T, dirname *string) func() {
 func testPrefix(t *testing.T) string {
 	// This to handle old versions of Go before the .Name() method was added.
 	if n, ok := interface{}(t).(namer); ok {
-		return n.Name() + "-"
+		return strings.Replace(n.Name(), string(os.PathSeparator), "_", -1) + "-"
 	}
 	return "testy-"
 }
