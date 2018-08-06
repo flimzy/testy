@@ -68,7 +68,7 @@ func StatusErrorRE(t *testing.T, expected string, status int, actual error) {
 		err = actual.Error()
 		actualStatus = StatusCode(actual)
 	}
-	if expected == "" || !regexp.MustCompile(expected).MatchString(err) {
+	if !regexp.MustCompile(expected).MatchString(err) || (expected == "" && err != "") {
 		t.Errorf("Unexpected error: %s (expected /%s/)", err, expected)
 	}
 	if status != actualStatus {
@@ -87,7 +87,7 @@ func ErrorRE(t *testing.T, expected string, actual error) {
 	if actual != nil {
 		err = actual.Error()
 	}
-	if expected == "" || !regexp.MustCompile(expected).MatchString(err) {
+	if !regexp.MustCompile(expected).MatchString(err) || (expected == "" && err != "") {
 		t.Errorf("Unexpected error: %s (expected /%s/)", err, expected)
 	}
 	if actual != nil {
