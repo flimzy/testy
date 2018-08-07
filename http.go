@@ -3,6 +3,7 @@ package testy
 import (
 	"io"
 	"net/http"
+	"net/http/httptest"
 )
 
 // ResponseHandler wraps an existing http.Response, to be served as a
@@ -26,4 +27,9 @@ func (h *ResponseHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		defer h.Body.Close() // nolint: errcheck
 		io.Copy(w, h.Body)
 	}
+}
+
+// ServeResponse starts a test HTTP server that serves r.
+func ServeResponse(r *http.Response) *httptest.Server {
+	return httptest.NewServer(&ResponseHandler{r})
 }
