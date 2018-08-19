@@ -35,10 +35,8 @@ func ServeResponse(r *http.Response) *httptest.Server {
 	return httptest.NewServer(&ResponseHandler{r})
 }
 
-// RequestValidator is a function that takes a *http.Request, and returns an
-// error if it does not meet expectations. If the function returns a non-nil
-// error, it is passed to t.Fatal().
-type RequestValidator func(*http.Request) error
+// RequestValidator is a function that takes a *http.Request for validation.
+type RequestValidator func(*testing.T, *http.Request)
 
 // ValidateRequest returns a middleware that calls fn(), to validate the HTTP
 // request, before continuing. An error returned by fn() will result in the
@@ -47,11 +45,7 @@ type RequestValidator func(*http.Request) error
 func ValidateRequest(t *testing.T, fn RequestValidator) func(http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			if err := fn(r); err != nil {
-				if err != nil {
-					t.Fatal(err)
-				}
-			}
+			fn(t, r)
 			next.ServeHTTP(w, r)
 		})
 	}
