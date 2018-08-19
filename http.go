@@ -1,7 +1,6 @@
 package testy
 
 import (
-	"fmt"
 	"io"
 	"net/http"
 	"net/http/httptest"
@@ -37,9 +36,9 @@ func ServeResponse(r *http.Response) *httptest.Server {
 }
 
 // RequestValidator is a function that takes a *http.Request, and returns an
-// error if it does not meet expectations. The error is turned into a 400
-// response.
-type RequestValidator func(*testing.T, *http.Request) error
+// error if it does not meet expectations. If the function returns a non-nil
+// error, it is passed to t.Fatal().
+type RequestValidator func(*http.Request) error
 
 // ValidateRequest returns a middleware that calls fn(), to validate the HTTP
 // request, before continuing. An error returned by fn() will result in the
@@ -48,11 +47,10 @@ type RequestValidator func(*testing.T, *http.Request) error
 func ValidateRequest(t *testing.T, fn RequestValidator) func(http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			if err := fn(t, r); err != nil {
-				w.Header().Add("X-Error", err.Error())
-				w.WriteHeader(http.StatusBadRequest)
-				fmt.Fprintf(w, "%s", err)
-				return
+			if err := fn(r); err != nil {
+				if err != nil {
+					t.Fatal(err)
+				}
 			}
 			next.ServeHTTP(w, r)
 		})
