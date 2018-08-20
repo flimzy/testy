@@ -10,14 +10,10 @@ func TestTableTests(t *testing.T) {
 		a, b   int
 		output int
 	}
-	table := &Table{
-		"one": func(_ *testing.T) interface{} {
-			return ttTest{a: 1, output: 1}
-		},
-		// "two": func(_ *testing.T) interface{} {
-		// 	return 1
-		// },
-	}
+	table := NewTable()
+	table.Add("one", func(_ *testing.T) interface{} {
+		return ttTest{a: 1, output: 1}
+	})
 	table.Run(t, func(t *testing.T, test ttTest) {
 		output := addFunc(test.a, test.b)
 		if output != test.output {
