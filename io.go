@@ -1,42 +1,70 @@
 package testy
 
 import (
+	"bytes"
 	"io"
 	"os"
+	"sync"
 )
 
-// Stdout redirects os.Stdout, and returns a reader to access the data that is
-// sent to stdout, along with a cleanup function to restore normal functionality.
-func Stdout() (io.Reader, func()) {
-	r, w, err := os.Pipe()
-	if err != nil {
-		panic(err)
-	}
-	orig := os.Stdout
-	os.Stdout = w
-	return r, func() { os.Stdout = orig }
+// Sadly, since os.Stdin, os.Stdout, and os.Stderr are truly global variables,
+// a global lock is the only option here.
+var globalLock sync.Mutex
+
+// RedirIO runs fn, with stdin redirected from in, and anything sent to stdout
+// or stderr returned.
+func RedirIO(in io.Reader, fn func()) (stdout, stderr io.Reader) {
+	globalLock.Lock()
+	defer globalLock.Unlock()
+	cleanupIn := replaceInput(&os.Stdin, in)
+	tmpout, cleanupOut := replaceOutput(&os.Stdout)
+	tmperr, cleanupErr := replaceOutput(&os.Stderr)
+
+	fn()
+
+	cleanupIn()
+	cleanupOut()
+	cleanupErr()
+	return tmpout, tmperr
 }
 
-// Stderr redirects os.Stderr, and returns a reader to access the data that is
-// sent to stdout, along with a cleanup function to restore normal functionality.
-func Stderr() (io.Reader, func()) {
+func replaceInput(old **os.File, in io.Reader) func() {
 	r, w, err := os.Pipe()
 	if err != nil {
 		panic(err)
 	}
-	orig := os.Stderr
-	os.Stderr = w
-	return r, func() { os.Stderr = orig }
+	go func() {
+		if _, err := io.Copy(w, in); err != nil {
+			panic(err)
+		}
+		w.Close()
+	}()
+	orig := *old
+	*old = r
+	return func() {
+		*old = orig
+	}
 }
 
-// Stdin redirects os.Stdin, and returns a writer to send data to stdin, along
-// with a cleanup function to restore normal functionality.
-func Stdin() (io.Writer, func()) {
+func replaceOutput(old **os.File) (io.Reader, func()) {
 	r, w, err := os.Pipe()
 	if err != nil {
 		panic(err)
 	}
-	orig := os.Stdin
-	os.Stdin = r
-	return w, func() { os.Stdin = orig }
+	new := &bytes.Buffer{}
+	wg := &sync.WaitGroup{}
+	wg.Add(1)
+	go func() {
+		if _, err := io.Copy(new, r); err != nil {
+			panic(err)
+		}
+		wg.Done()
+	}()
+	orig := *old
+	*old = w
+	return new, func() {
+		w.Close()
+		wg.Wait()
+		*old = orig
+	}
 }
