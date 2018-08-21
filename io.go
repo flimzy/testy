@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"io"
 	"os"
+	"strings"
 	"sync"
 )
 
@@ -29,6 +30,9 @@ func RedirIO(in io.Reader, fn func()) (stdout, stderr io.Reader) {
 }
 
 func replaceInput(old **os.File, in io.Reader) func() {
+	if in == nil {
+		in = strings.NewReader("")
+	}
 	r, w, err := os.Pipe()
 	if err != nil {
 		panic(err)

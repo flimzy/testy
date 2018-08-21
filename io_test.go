@@ -12,9 +12,10 @@ import (
 
 func TestRedirIO(t *testing.T) {
 	tests := []struct {
-		name                  string
-		fn                    func()
-		stdin, stdout, stderr string
+		name           string
+		fn             func()
+		stdin          io.Reader
+		stdout, stderr string
 	}{
 		{
 			name:   "stdout",
@@ -31,13 +32,13 @@ func TestRedirIO(t *testing.T) {
 			fn: func() {
 				io.Copy(os.Stdout, os.Stdin)
 			},
-			stdin:  "testing",
+			stdin:  strings.NewReader("testing"),
 			stdout: "testing",
 		},
 	}
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			out, err := RedirIO(strings.NewReader(test.stdin), test.fn)
+			out, err := RedirIO(test.stdin, test.fn)
 			if d := diff.Text(test.stdout, out); d != nil {
 				t.Errorf("stdout:\n%s", d)
 			}
