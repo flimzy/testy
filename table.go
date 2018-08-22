@@ -30,9 +30,27 @@ func NewTable(generators ...map[string]Generator) *Table {
 }
 
 // Add adds a single named test to the table.
-func (tb *Table) Add(name string, gen Generator) {
+// test may be of the following types:
+//
+// interface{}
+// func() interface{}
+// func(*testing.T) interface{}
+func (tb *Table) Add(name string, test interface{}) {
 	if _, ok := tb.gens[name]; ok {
 		panic("Add(): Test " + name + " already defined.")
+	}
+	var gen func(*testing.T) interface{}
+	switch typedTest := test.(type) {
+	case func() interface{}:
+		gen = func(_ *testing.T) interface{} {
+			return typedTest()
+		}
+	case func(*testing.T) interface{}:
+		gen = typedTest
+	default:
+		gen = func(_ *testing.T) interface{} {
+			return test
+		}
 	}
 	tb.gens[name] = gen
 }

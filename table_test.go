@@ -14,6 +14,10 @@ func TestTableTests(t *testing.T) {
 	table.Add("one", func(_ *testing.T) interface{} {
 		return ttTest{a: 1, output: 1}
 	})
+	table.Add("two", ttTest{a: 1, b: 1, output: 2})
+	table.Add("three", func() interface{} {
+		return ttTest{a: 1, b: 2, output: 3}
+	})
 	table.Run(t, func(t *testing.T, test ttTest) {
 		output := addFunc(test.a, test.b)
 		if output != test.output {
