@@ -7,6 +7,7 @@ import (
 	"os"
 	"runtime"
 	"strconv"
+	"strings"
 )
 
 // Warn outputs the formatted text to STDERR, prefixed with some useful
@@ -29,7 +30,14 @@ func Warnf(f io.Writer, format string, args ...interface{}) (int, error) {
 }
 
 func warn() string {
-	_, file, line, _ := runtime.Caller(2)
+	var file string
+	var line int
+	for skip := 2; skip < 5; skip++ {
+		_, file, line, _ = runtime.Caller(skip)
+		if !strings.HasSuffix(file, "flimzy/testy/warn.go") {
+			break
+		}
+	}
 	return fmt.Sprintf("[%d/%d %s:%d] ", os.Getpid(), getGID(), file, line)
 }
 
