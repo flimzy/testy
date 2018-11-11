@@ -18,11 +18,11 @@ type namer interface {
 //
 // It is meant to be run as so:
 //
-// t.Run(func(t *testing.T) {
-//     tmpDir := new(string)
-//     defer testy.TempDir(t, tmpDir)()
-//     /*  here you can use tmpDir  */
-// })
+//     t.Run(func(t *testing.T) {
+//         tmpDir := new(string)
+//         defer testy.TempDir(t, tmpDir)()
+//         /*  here you can use tmpDir  */
+//     })
 func TempDir(t *testing.T, dirname *string) func() {
 	dir, err := ioutil.TempDir("", testPrefix(t))
 	if err != nil {
