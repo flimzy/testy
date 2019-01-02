@@ -1,6 +1,7 @@
 package testy
 
 import (
+	"fmt"
 	"reflect"
 	"testing"
 )
@@ -48,6 +49,9 @@ func (tb *Table) Add(name string, test interface{}) {
 	case func(*testing.T) interface{}:
 		gen = typedTest
 	default:
+		if reflect.TypeOf(test).Kind() == reflect.Func {
+			panic(fmt.Sprintf("Test generator must be of type func(*testing.T) interface{} or func() interface{}, got %T", test))
+		}
 		gen = func(_ *testing.T) interface{} {
 			return test
 		}
