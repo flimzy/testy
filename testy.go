@@ -177,3 +177,10 @@ func FullError(t *testing.T, expected string, status, eStatus int, actual error)
 		t.SkipNow()
 	}
 }
+
+var stubRE = regexp.MustCompile(`[\s\/]`)
+
+// Stub returns t.Name(), with whitespace and slashes converted to underscores.
+func Stub(t *testing.T) string {
+	return stubRE.ReplaceAllString(t.Name(), "_")
+}
