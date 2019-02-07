@@ -74,6 +74,7 @@ func (tb *Table) Cleanup(fn interface{}) {
 		cleanup = typedFn
 	case func() error:
 		cleanup = func(t *testing.T) {
+			t.Helper()
 			if e := typedFn(); e != nil {
 				t.Error(e)
 			}
@@ -106,6 +107,7 @@ func (tb *Table) Run(t *testing.T, testFn interface{}) {
 	testFnV := reflect.ValueOf(testFn)
 	for name, genFn := range tb.gens {
 		t.Run(name, func(t *testing.T) {
+			t.Helper()
 			test := genFn(t)
 			if reflect.TypeOf(test) != testType {
 				t.Fatalf("Test generator returned wrong type. Have %T, want %s", test, testType.Name())
