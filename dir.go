@@ -24,6 +24,7 @@ type namer interface {
 //         /*  here you can use tmpDir  */
 //     })
 func TempDir(t *testing.T, dirname *string) func() {
+	t.Helper()
 	dir, err := ioutil.TempDir("", testPrefix(t))
 	if err != nil {
 		t.Fatal(err)
