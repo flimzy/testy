@@ -57,3 +57,19 @@ func ServeResponseValidator(t *testing.T, r *http.Response, fn RequestValidator)
 	mw := ValidateRequest(t, fn)
 	return httptest.NewServer(mw(&ResponseHandler{r}))
 }
+
+// HTTPResponder is a function which intercepts and responds to an HTTP request.
+type HTTPResponder func(*http.Request) (*http.Response, error)
+
+var _ http.RoundTripper = HTTPResponder(nil)
+
+// RoundTrip satisfies the http.RoundTripper interface
+func (t HTTPResponder) RoundTrip(r *http.Request) (*http.Response, error) {
+	return t(r)
+}
+
+// HTTPClient returns a customized *http.Client, which passes the request to
+// fn, rather than to the network.
+func HTTPClient(fn HTTPResponder) *http.Client {
+	return &http.Client{Transport: fn}
+}
