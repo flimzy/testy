@@ -33,9 +33,9 @@ func NewTable(generators ...map[string]Generator) *Table {
 // Add adds a single named test to the table.
 // test may be of the following types:
 //
-// interface{}
-// func() interface{}
-// func(*testing.T) interface{}
+//    - interface{}
+//    - func() interface{}
+//    - func(*testing.T) interface{}
 func (tb *Table) Add(name string, test interface{}) {
 	if _, ok := tb.gens[name]; ok {
 		panic("Add(): Test " + name + " already defined.")
@@ -62,9 +62,9 @@ func (tb *Table) Add(name string, test interface{}) {
 // Cleanup takes a single function to be called after all Table tests have been
 // executed. fn must match one of the following signatures:
 //
-// - func()
-// - func() error
-// - func(*testing.T)
+//    - func()
+//    - func() error
+//    - func(*testing.T)
 func (tb *Table) Cleanup(fn interface{}) {
 	var cleanup func(*testing.T)
 	switch typedFn := fn.(type) {
