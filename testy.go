@@ -9,7 +9,7 @@ import (
 // Error compares actual.Error() against expected, and triggers an error if
 // they do not match. If actual is non-nil, t.SkipNow() is called as well.
 func Error(t *testing.T, expected string, actual error) {
-	t.Helper()
+	helper(t)()
 	var err string
 	if actual != nil {
 		err = actual.Error()
@@ -42,7 +42,7 @@ func StatusCode(err error) int {
 // expected, and triggers an error if they do not match. If actual is non-nil,
 // t.SkipNow() is called as well.
 func StatusError(t *testing.T, expected string, status int, actual error) {
-	t.Helper()
+	helper(t)()
 	var err string
 	var actualStatus int
 	if actual != nil {
@@ -64,7 +64,7 @@ func StatusError(t *testing.T, expected string, status int, actual error) {
 // expected, and triggers an error if they do not match. If actual is non-nil,
 // t.SkipNow() is called as well.
 func StatusErrorRE(t *testing.T, expected string, status int, actual error) {
-	t.Helper()
+	helper(t)()
 	var err string
 	var actualStatus int
 	if actual != nil {
@@ -86,7 +86,7 @@ func StatusErrorRE(t *testing.T, expected string, status int, actual error) {
 // regular expression, and triggers an error if they do not match. If actual is
 // non-nil, t.SkipNow() is called as well.
 func ErrorRE(t *testing.T, expected string, actual error) {
-	t.Helper()
+	helper(t)()
 	var err string
 	if actual != nil {
 		err = actual.Error()
@@ -119,7 +119,7 @@ func ExitStatus(err error) int {
 // expected, and triggers an error if they do not match. If actual is non-nil,
 // t.SkipNow() is called as well.
 func ExitStatusError(t *testing.T, expected string, eStatus int, actual error) {
-	t.Helper()
+	helper(t)()
 	var err string
 	var actualEStatus int
 	if actual != nil {
@@ -141,7 +141,7 @@ func ExitStatusError(t *testing.T, expected string, eStatus int, actual error) {
 // expected, and triggers an error if they do not match. If actual is non-nil,
 // t.SkipNow() is called as well.
 func ExitStatusErrorRE(t *testing.T, expected string, eStatus int, actual error) {
-	t.Helper()
+	helper(t)()
 	var err string
 	var actualEStatus int
 	if actual != nil {
@@ -163,7 +163,7 @@ func ExitStatusErrorRE(t *testing.T, expected string, eStatus int, actual error)
 // against expected, and triggers an error if they do not match. If actual is
 // non-nil, t.SkipNow() is called as well.
 func FullError(t *testing.T, expected string, status, eStatus int, actual error) {
-	t.Helper()
+	helper(t)()
 	var err string
 	var actualStatus, actualEStatus int
 	if actual != nil {
