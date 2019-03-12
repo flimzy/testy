@@ -189,5 +189,10 @@ var stubRE = regexp.MustCompile(`[\s\/]`)
 
 // Stub returns t.Name(), with whitespace and slashes converted to underscores.
 func Stub(t *testing.T) string {
-	return stubRE.ReplaceAllString(t.Name(), "_")
+	// This to handle old versions of Go before the .Name() method was added.
+	if n, ok := interface{}(t).(namer); ok {
+		return stubRE.ReplaceAllString(n.Name(), "_")
+	}
+	t.Fatal("t.Name() not supported by your version of Go")
+	return ""
 }
