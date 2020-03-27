@@ -1,3 +1,7 @@
+// Package testy is some testing utilities.
+//
+// Deprecated: This package is no longer maintained. Please use
+// gitlab.com/flimzy/testy instead.
 package testy
 
 import (
